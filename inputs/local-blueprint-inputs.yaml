@@ -1,0 +1,115 @@
+# This input file contains all necessary configuration settings in order to
+# setup the AMQP Middleware. Most of the parameters below come with default
+# values. Settings that are not commented out MUST be provided by the user.
+
+# # # # # # # # # # # # #
+# Cloudify Manager Inputs
+# # # # # # # # # # # # #
+
+# The IP of Cloudify Manager's HTTP API.
+manager_host: ''
+
+# Denotes whether Cloudify Manager has security enabled. In that case, one must
+# set `manager_secure` to `true` and provide the username and password required
+# for authentication.
+#manager_secure: false
+#manager_username: 'cloudify'
+#manager_password: 'cloudify'
+
+# Denotes whether SSL is enabled. If `true`, the path to the bundle of CA
+# certificates must also be specified.
+#manager_ssl_enabled: false
+#manager_ca_certs: '/etc/ssl/certs/ca-bundle.crt'
+#manager_cert_verify: true
+
+# The endpoint of Cloudify Manager's RabbitMQ server. This set of parameters is
+# mandatory in order for the AMQP Middleware to be able to connect to RabbitMQ.
+# If security is enabled, RabbitMQ listens by default at port 5671.
+rabbitmq_host: ''
+#rabbitmq_port: 5672
+
+# Specifies the username and password to be used in order to connect to
+# Cloudify Manager's RabbitMQ server.
+#rabbitmq_username: 'cloudify'
+#rabbitmq_password: 'cloudify'
+
+# If RabbitMQ server has SSL enabled, set `rabbitmq_ssl_enabled` to `true`. In
+# general, the following option is enabled in case of a secure Cloudify Manager
+# installation.
+#rabbitmq_ssl_enabled: false
+#rabbitmq_cert_public: '/etc/rabbitmq/rabbit-pub.pem'
+
+# # # # # # # # # # # # #
+# User Inputs
+# # # # # # # # # # # # #
+
+# User information for registration.
+user_name: ''
+user_email: ''
+
+# # # # # # # # # # # # #
+# Stream Inputs
+# # # # # # # # # # # # #
+
+# The destination URL to publish data to.
+destination_url: ''
+
+# Specifies whether the streaming of data should be over SSL.
+#secure: false
+#ca_certs: '/etc/pki/tls/certs/ca-bundle.crt'
+
+# # # # # # # # # # # # #
+# Cloud Credentials
+# # # # # # # # # # # # #
+
+# This section allows users to automatically populate a new account with clouds
+# upon registration. For that to happen, uncomment the desired cloud section
+# and fill in the necessary cloud credentials.
+
+credentials:
+#  ec2:
+#    title: 'EC2'
+#    apikey: ''
+#    apisecret: ''
+#    region: ''
+
+#  digitalocean:
+#    title: 'DigitalOcean'
+#    token: ''
+
+#  openstack:
+#    title: 'OpenStack'
+#    url: ''
+#    username: ''
+#    password: ''
+#    tenant: ''
+#    region: ''  # optional
+#    compute_endpoint: ''  # optional
+
+#  azure:
+#    title: 'Azure'
+#    subscription_id: ''
+#    certificate: ''
+
+#  vcloud:
+#    title: 'vCloud'
+#    host: ''
+#    username: ''
+#    password: ''
+#    organization: ''
+
+#  vsphere:
+#    title: 'vSphere'
+#    host: ''
+#    username: ''
+#    password: ''
+
+#  docker:
+#    title: 'Docker'
+#    host: ''
+#    port: 4243
+#    username: ''  # optional, in case of username/password authentication
+#    password: ''  # optional, in case of username/password authentication
+#    key_file: ''  # optional, TLS authentication
+#    cert_file: ''  # optional, TLS authentication
+#    ca_cert_file: ''  # optional, TLS authentication

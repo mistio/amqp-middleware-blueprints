@@ -1,0 +1,160 @@
+# DEPRECATED
+
+data_types:
+  cloudify.datatypes.manager.CloudCredentials:
+    properties:
+      ec2:
+        type: cloudify.datatypes.manager.AmazonCredentials
+      digitalocean:
+        type: cloudify.datatypes.manager.DigitalOceanCredentials
+      openstack:
+        type: cloudify.datatypes.manager.OpenStackCredentials
+      azure:
+        type: cloudify.datatypes.manager.AzureCredentials
+      vcloud:
+        type: cloudify.datatypes.manager.vCloudCredentials
+      vsphere:
+        type: cloudify.datatypes.manager.vSphereCredentials
+      docker:
+        type: cloudify.datatypes.manager.DockerCredentials
+
+  cloudify.datatypes.manager.AmazonCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: aws_populate }
+      title:
+        type: string
+        default: 'EC2'
+      api_key:
+        type: string
+        default: { get_input: aws_apikey }
+      api_secret:
+        type: string
+        default: { get_input: aws_apisecret}
+      region:
+        type: string
+        default: { get_input: aws_region }
+
+  cloudify.datatypes.manager.DigitalOceanCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: do_populate }
+      title:
+        type: string
+        default: 'DigitalOcean'
+      token:
+        type: string
+        default: { get_input: do_token }
+
+  cloudify.datatypes.manager.OpenStackCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: openstack_populate }
+      title:
+        type: string
+        default: 'OpenStack'
+      auth_url:
+        type: string
+        default: { get_input: openstack_url }
+      username:
+        type: string
+        default: { get_input: openstack_username }
+      password:
+        type: string
+        default: { get_input: openstack_password }
+      tenant_name:
+        type: string
+        default: { get_input: openstack_tenant }
+      region:
+        type: string
+        default: { get_input: openstack_region }
+      compute_endpoint:
+        type: string
+        default: { get_input: openstack_compute_endpoint }
+
+  cloudify.datatypes.manager.AzureCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: azure_populate }
+      title:
+        type: string
+        default: 'Azure'
+      subscription_id:
+        type: string
+        default: { get_input: azure_subscription_id }
+      certificate:
+        type: string
+        default: { get_input: azure_certificate }
+
+  cloudify.datatypes.manager.vCloudCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: vcloud_populate }
+      title:
+        type: string
+        default: 'vCloud'
+      host:
+        type: string
+        default: { get_input: vcloud_host }
+      username:
+        type: string
+        default: { get_input: vcloud_username }
+      password:
+        type: string
+        default: { get_input: vcloud_password }
+      organization:
+        type: string
+        default: { get_input: vcloud_organization }
+
+  cloudify.datatypes.manager.vSphereCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: vsphere_populate }
+      title:
+        type: string
+        default: 'vSphere'
+      host:
+        type: string
+        default: { get_input: vsphere_host }
+      username:
+        type: string
+        default: { get_input: vsphere_username }
+      password:
+        type: string
+        default: { get_input: vsphere_password }
+
+  cloudify.datatypes.manager.DockerCredentials:
+    properties:
+      populate:
+        type: boolean
+        default: { get_input: docker_populate }
+      title:
+        type: string
+        default: 'Docker'
+      docker_host:
+        type: string
+        default: { get_input: docker_host }
+      docker_port:
+        type: integer
+        default: { get_input: docker_port }
+      auth_user:
+        type: string
+        default: { get_input: docker_username }
+      auth_pass:
+        type: string
+        default: { get_input: docker_password }
+      key_file:
+        type: string
+        default: { get_input: docker_key_file }
+      cert_file:
+        type: string
+        default: { get_input: docker_cert_file }
+      ca_cert_file:
+        type: string
+        default: { get_input: docker_ca_cert_file }

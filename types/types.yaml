@@ -1,0 +1,88 @@
+data_types:
+  cloudify.datatypes.manager.ManagerConfiguration:
+    properties:
+      manager_host:
+        type: string
+        default: { get_input: manager_host }
+      manager_secure:
+        type: boolean
+        default: { get_input: manager_secure }
+      manager_username:
+        type: string
+        default: { get_input: manager_username }
+      manager_password:
+        type: string
+        default: { get_input: manager_password }
+      manager_ssl_enabled:
+        type: boolean
+        default: { get_input: manager_ssl_enabled }
+      manager_ca_certs:
+        type: string
+        default: { get_input: manager_ca_certs }
+      manager_verify:
+        type: boolean
+        default: { get_input: manager_cert_verify }
+      rabbitmq_host:
+        type: string
+        default: { get_input: rabbitmq_host }
+      rabbitmq_port:
+        type: integer
+        default: { get_input: rabbitmq_port }
+      rabbitmq_username:
+        type: string
+        default: { get_input: rabbitmq_username }
+      rabbitmq_password:
+        type: string
+        default: { get_input: rabbitmq_password }
+      rabbitmq_ssl_enabled:
+        type: boolean
+        default: { get_input: rabbitmq_ssl_enabled }
+      rabbitmq_cert_public:
+        type: string
+        default: { get_input: rabbitmq_cert_public }
+
+  cloudify.datatypes.manager.UserInformation:
+    properties:
+      name:
+        type: string
+        default: { get_input: user_name }
+      email:
+        type: string
+        default: { get_input: user_email }
+
+  cloudify.datatypes.manager.StreamConfiguration:
+    properties:
+      destination_url:
+        type: string
+        default: { get_input: destination_url }
+      secure:
+        type: boolean
+        default: { get_input: secure }
+      ca_certs:
+        type: string
+        default: { get_input: ca_certs }
+
+
+node_types:
+  cloudify.manager.nodes.AMQPMiddleware:
+    derived_from: cloudify.nodes.SoftwareComponent
+    properties:
+      manager:
+        description: >
+          The necessary configuration parameters required by
+          the RabbitMQ Middleware
+        type: cloudify.datatypes.manager.ManagerConfiguration
+      stream:
+        description: >
+          Configuration regarding the streaming of data
+        type: cloudify.datatypes.manager.StreamConfiguration
+      user:
+        description: >
+          User information, including first name, last name,
+          and e-mail address for registration purposes
+        type: cloudify.datatypes.manager.UserInformation
+      creds:
+        description: >
+          Cloud credentials used to automatically populate
+          the new account right after registration
+        default: { get_input: credentials }

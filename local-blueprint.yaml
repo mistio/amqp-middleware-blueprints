@@ -1,0 +1,150 @@
+tosca_definitions_version: cloudify_dsl_1_2
+
+
+imports:
+  - http://www.getcloudify.org/spec/cloudify/3.3/types.yaml
+  - types/types.yaml
+
+
+inputs:
+
+  # # # # # # # # # # # # #
+  # Cloudify Manager Inputs
+  # # # # # # # # # # # # #
+
+  manager_host:
+    description: The IP address of the Cloudify Manager
+    type: string
+  manager_secure:
+    description: Denotes whether Cloudify Manager has security enabled
+    type: boolean
+    default: false
+  manager_username:
+    description: Cloudify Manager's username in case security is enabled
+    type: string
+    default: 'cloudify'
+  manager_password:
+    description: Cloudify Manager's password in case security is enabled
+    type: string
+    default: 'cloudify'
+  manager_ssl_enabled:
+    description: Specifies whether Cloudify Manager has SSL enabled
+    type: boolean
+    default: false
+  manager_ca_certs:
+    description: CA certificates to be used for SSL
+    type: string
+    default: '/etc/ssl/certs/ca-bundle.crt'
+  manager_cert_verify:
+    description: Specifies whether to verify Cloudify Manager's SSL certificate
+    type: boolean
+    default: true
+  rabbitmq_host:
+    description: The IP address of Cloudify Manager's RabbitMQ server
+    type: string
+  rabbitmq_port:
+    description: The port Cloudify Manager's RabbitMQ server listens at
+    type: integer
+    default: 5672
+  rabbitmq_username:
+    description: Username used to connect to RabbitMQ
+    type: string
+    default: 'cloudify'
+  rabbitmq_password:
+    description: Password used to connect to RabbitMQ
+    type: string
+    default: 'cloudify'
+  rabbitmq_ssl_enabled:
+    description: Specifies whether RabbitMQ has SSL enabled
+    type: boolean
+    default: false
+  rabbitmq_cert_public:
+    description: The public certificate to be used for SSL
+    type: string
+    default: '/etc/rabbitmq/rabbit-pub.pem'
+
+  # # # # # # # # # # # # #
+  # User Inputs
+  # # # # # # # # # # # # #
+
+  user_name:
+    description: User's full name for registration
+    type: string
+  user_email:
+    description: User's e-mail
+    type: string
+
+  # # # # # # # # # # # # #
+  # Stream Inputs
+  # # # # # # # # # # # # #
+
+  destination_url:
+    description: The destination URL to stream data to
+    type: string
+  secure:
+    description: Specifies whether SSL should be used for the data streaming
+    type: boolean
+    default: false
+  ca_certs:
+    description: Path to the bundle of CA certificates in case SSL is enabled
+    type: string
+    default: '/etc/pki/tls/certs/ca-bundle.crt'
+
+  # # # # # # # # # # # # #
+  # Cloud Credentials
+  # # # # # # # # # # # # #
+
+  credentials:
+    description: Cloud credentials
+    default: {}
+
+
+node_templates:
+  consumer:
+    type: cloudify.manager.nodes.AMQPMiddleware
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        create:
+          implementation: tasks/install.py
+          inputs:
+            agent_source: git+https://github.com/pchristos/amqp-middleware.git@master#egg=amqp-middleware
+          executor: central_deployment_agent
+        start:
+          implementation: tasks/start.py
+          executor: central_deployment_agent
+        stop:
+          implementation: tasks/stop.py
+          executor: central_deployment_agent
+        delete:
+          implementation: tasks/uninstall.py
+          inputs:
+            remove_source: true
+          executor: central_deployment_agent
+        update:
+          implementation: tasks/update.py
+          executor: central_deployment_agent
+        remove:
+          implementation: tasks/remove.py
+          executor: central_deployment_agent
+
+
+workflows:
+  add_cloud:
+    mapping: workflows/add_cloud.py
+    parameters:
+      credentials:
+        description: New cloud credentials
+        default: {}
+  remove_cloud:
+    mapping: workflows/remove_cloud.py
+    parameters:
+      clouds:
+        description: A list of clouds, specified by title, to be removed
+        default: []
+
+
+outputs:
+  insights:
+    description: The URL used to access your account
+    value:
+      url: { get_attribute: [ consumer, insights_url ] }
