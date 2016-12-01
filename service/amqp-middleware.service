@@ -1,0 +1,15 @@
+[Unit]
+Description=AMQP Consumer-Publisher Middleware
+Wants=cloudify-rabbitmq.service
+After=cloudify-rabbitmq.service
+
+[Service]
+TimeoutStartSec=0
+Restart=on-failure
+EnvironmentFile=/etc/sysconfig/amqp-middleware-env
+User=root
+Group=root
+ExecStart=/opt/amqp-middleware/venv/bin/python /opt/amqp-middleware/venv/bin/amqp-middleware
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,22 @@
+HOST="{{ ctx.instance.runtime_properties.config.manager.host }}"
+USERNAME="{{ ctx.instance.runtime_properties.config.manager.username }}"
+PASSWORD="{{ ctx.instance.runtime_properties.config.manager.password }}"
+
+SECURE="{{ ctx.instance.runtime_properties.config.manager.secure }}"
+VERIFY="{{ ctx.instance.runtime_properties.config.manager.verify }}"
+CA_CERTS="{{ ctx.instance.runtime_properties.config.manager.ca_certs }}"
+SSL_ENABLED="{{ ctx.instance.runtime_properties.config.manager.ssl_enabled }}"
+
+RABBITMQ_HOST="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_host }}"
+RABBITMQ_PORT="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_port }}"
+RABBITMQ_USERNAME="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_username }}"
+RABBITMQ_PASSWORD="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_password }}"
+RABBITMQ_SSL_ENABLED="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_ssl_enabled }}"
+RABBITMQ_CERT_PUBLIC="{{ ctx.instance.runtime_properties.config.manager.rabbitmq_cert_public }}"
+
+STREAM_SECURE="{{ ctx.instance.runtime_properties.config.stream.secure }}"
+STREAM_CA_CERTS="{{ ctx.instance.runtime_properties.config.stream.ca_certs }}"
+DESTINATION_URL="{{ ctx.instance.runtime_properties.config.stream.destination_url }}"
+
+TOKEN="{{ ctx.instance.runtime_properties._meta.token }}"
+MANAGER_ID="{{ ctx.instance.runtime_properties._meta.manager_id }}"
