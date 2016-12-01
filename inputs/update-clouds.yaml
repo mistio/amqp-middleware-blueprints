@@ -1,0 +1,54 @@
+# Uncomment the desired Cloud section and fill in the necessary credentials
+# before executing the add_cloud workflow.
+
+# # # # # # # # # # # # #
+# Update Clouds
+# # # # # # # # # # # # #
+
+credentials:
+#  ec2:
+#    title: 'EC2'
+#    apikey: ''
+#    apisecret: ''
+#    region: ''
+
+#  digitalocean:
+#    title: 'DigitalOcean'
+#    token: ''
+
+#  openstack:
+#    title: 'OpenStack'
+#    url: ''
+#    username: ''
+#    password: ''
+#    tenant: ''
+#    region: ''
+#    compute_endpoint: ''
+
+#  azure:
+#    title: 'Azure'
+#    subscription_id: ''
+#    certificate: ''
+
+#  vcloud:
+#    title: 'vCloud'
+#    host: ''
+#    username: ''
+#    password: ''
+#    organization: ''
+
+#  vsphere:
+#    title: 'vSphere'
+#    host: ''
+#    username: ''
+#    password: ''
+
+#  docker:
+#    title: 'Docker'
+#    host: ''
+#    port: 4243
+#    username: ''
+#    password: ''
+#    key_file: ''
+#    cert_file: ''
+#    ca_cert_file: ''

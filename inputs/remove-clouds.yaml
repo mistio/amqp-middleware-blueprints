@@ -1,0 +1,9 @@
+# Pass a list of clouds (by title) to be removed.
+
+# # # # # # # # # # # # #
+# Remove Clouds
+# # # # # # # # # # # # #
+
+clouds:
+#    - 'EC2'
+#    -
