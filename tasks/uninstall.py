@@ -2,6 +2,7 @@ from cloudify import ctx
 from cloudify.state import ctx_parameters as inputs
 
 import os
+import sys
 import shutil
 
 
@@ -10,9 +11,13 @@ ctx.download_resource(
     os.path.join(os.path.dirname(__file__), 'utils.py')
 )
 
-
-from utils import run_command
-from utils import SystemController
+try:
+    from utils import run_command
+    from utils import SystemController
+except ImportError:
+    sys.path.append(os.path.dirname(__file__))
+    from utils import run_command
+    from utils import SystemController
 
 
 systemctl = SystemController('amqp-middleware')

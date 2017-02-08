@@ -2,6 +2,7 @@ from cloudify import ctx
 from cloudify.exceptions import CommandExecutionException
 
 import os
+import sys
 
 
 ctx.download_resource(
@@ -9,8 +10,11 @@ ctx.download_resource(
     os.path.join(os.path.dirname(__file__), 'utils.py')
 )
 
-
-from utils import SystemController
+try:
+    from utils import SystemController
+except ImportError:
+    sys.path.append(os.path.dirname(__file__))
+    from utils import SystemController
 
 
 try:

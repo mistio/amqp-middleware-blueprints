@@ -2,6 +2,7 @@ from cloudify import ctx
 from cloudify.state import ctx_parameters as inputs
 
 import os
+import sys
 import json
 import requests
 
@@ -11,8 +12,11 @@ ctx.download_resource(
     os.path.join(os.path.dirname(__file__), 'utils.py')
 )
 
-
-from utils import add_cloud
+try:
+    from utils import add_cloud
+except ImportError:
+    sys.path.append(os.path.dirname(__file__))
+    from utils import add_cloud
 
 
 if inputs.cloud_creds:
