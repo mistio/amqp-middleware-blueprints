@@ -22,3 +22,4 @@ systemctl.execute('start')
 systemctl.execute('status')
 
 ctx.logger.info('AMQP Middleware is up and running!')
+ctx.logger.info('Execute "cfy local outputs" and browse to the returned URL!')

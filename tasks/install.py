@@ -5,7 +5,7 @@ from cloudify.exceptions import HttpException, NonRecoverableError
 import os
 import sys
 import json
-import shutil
+import urlparse
 import requests
 
 
@@ -21,10 +21,10 @@ except ImportError:
     import utils
 
 
-# Definition of constant parameters.
+AGENT_BASE = '/opt/amqp-middleware'
 AGENT_VENV = '/opt/amqp-middleware/venv'
-AGENT_USER = 'root'
-AGENT_GROUP = 'root'
+
+AGENT_USER = AGENT_GROUP = 'root'
 
 
 def init():
@@ -40,17 +40,18 @@ def init():
         raise NonRecoverableError(exc)
     try:
         # Remove base dir, if exists, in case of re-installation.
-        shutil.rmtree('/opt/amqp-middleware')
+        cmd = ['rm', '-rf', AGENT_BASE]
+        utils.run_command(cmd, su=True)
     except OSError:
         pass
 
 
-def deploy_agent(path=AGENT_VENV):
+def deploy_agent():
     """The main method of the `install` workflow, responsible for executing all
     necessary steps in order to configure and initiate the AMQP Middleware.
     """
     ctx.logger.info('Creating virtualenv')
-    cmd = ['virtualenv', path]
+    cmd = ['virtualenv', AGENT_VENV]
     utils.run_command(cmd, su=True)
 
     ctx.logger.info('Installing AMQP Middleware and required dependencies')
@@ -60,10 +61,6 @@ def deploy_agent(path=AGENT_VENV):
 
     # Get node properties.
     node_properties = ctx.node.properties.copy()
-    # No need to store user login information.
-    node_properties.pop('user')
-    # Get cloud credentials.
-    clouds = node_properties.pop('creds', {})
 
     # Rename kwargs for easier use later on.
     for key in node_properties['manager']:
@@ -71,23 +68,28 @@ def deploy_agent(path=AGENT_VENV):
             utils.rename_kwargs(node_properties['manager'],
                           key, key.replace('manager_', ''))
 
-    # Pass all properties to node instance's runtime properties
+    # Register new user and populate account with clouds.
+    register(node_properties.pop('user'))
+    populate(node_properties.pop('creds', {}))
+
+    # Set RabbitMQ host, if missing.
+    if not node_properties['manager'].get('rabbitmq_host'):
+        rabbitmq_host = node_properties['manager']['host']
+        node_properties['manager']['rabbitmq_host'] = rabbitmq_host
+
+    # Pass all properties to the node instance's runtime properties
     # for easier rendering.
     ctx.instance.runtime_properties['config'] = node_properties
-
-    # Register new User and populate account with clouds.
-    register()
-    populate(clouds)
-
-    ctx.logger.info('Setting user/group permissions for AMQP Middleware')
-    cmd = ['chown', '-R', '%s:%s' % (AGENT_USER, AGENT_GROUP), path]
-    utils.run_command(cmd, su=True)
 
     ctx.logger.info('Rendering EnvironmentFile')
     utils.render_to_file(
         os.path.join('service', 'amqp-middleware-env'),
         '/etc/sysconfig/amqp-middleware-env'
     )
+
+    ctx.logger.info('Setting user/group permissions for AMQP Middleware')
+    cmd = ['chown', '-R', '%s:%s' % (AGENT_USER, AGENT_GROUP), AGENT_BASE]
+    utils.run_command(cmd, su=True)
 
     # Configure systemd.
     systemctl = utils.SystemController(service='amqp-middleware')
@@ -96,44 +98,58 @@ def deploy_agent(path=AGENT_VENV):
     systemctl.execute('reload')
 
 
-def register():
+def register(user):
     """A helper method to take care of the registration process and store all
     necessary information into the node instance's runtime properties.
     """
-    config = ctx.node.properties['stream']
-    scheme = 'https' if config['secure'] else 'http'
-    url = '%s://%s/api/v1/insights/register' % (scheme,
-                                                config['destination_url'])
-
     ctx.logger.info('Registration process started')
-    registration = requests.post(
-        url, data=json.dumps(ctx.node.properties['user'])
-    )
-    if not registration.ok:
-        raise HttpException(url=url, code=registration.status_code,
-                            message=registration.content)
+    # Get destination URL.
+    host = ctx.node.properties['stream']['destination_url']
+    # Get proper scheme, verify host, and prepare headers, if applicable.
+    if ctx.node.properties['stream']['secure']:
+        scheme = 'https'
+    else:
+        scheme = 'http'
+    if not host:
+        raise NonRecoverableError('No destination_url specified')
+    if urlparse.urlparse(host).scheme:
+        raise NonRecoverableError('Malformed destination_url. '
+                                  'It must be in the form of: "example.com"')
+    headers = {}
+    if user.get('exists'):
+        if not user.get('token'):
+            NonRecoverableError('An existing user is about to be used, but '
+                                'no authorization token was specified')
+        headers = {'Authorization': user.pop('token')}
+    else:
+        for key in ('email', 'name'):
+            if not user.get(key):
+                raise NonRecoverableError('Required input missing: "%s"' % key)
 
-    resp = registration.json()
-    ctx.instance.runtime_properties['insights_url'] = resp['url']
-    ctx.instance.runtime_properties['_meta'] = {
-        'manager_id': resp['uuid'],
-        'token': resp['token'],
-    }
+    url = '%s://%s/api/v1/insights/register' % (scheme, host)
+    reg = requests.post(url, data=json.dumps(user), headers=headers)
+    if not reg.ok:
+        raise HttpException(url=url, code=reg.status_code, message=reg.content)
+
+    response = reg.json()
+    ctx.instance.runtime_properties.update({
+        'insights_url': response['url'],
+        '_meta': {
+            'token': response['token'],
+            'manager_id': response['uuid'],
+        }
+    })
 
 
-def populate(cloud_creds):
+def populate(clouds):
     """A helper method responsible for executing HTTP API calls in order to
     transfer cloud credentials right after registration.
     """
-    if not cloud_creds:
+    if not clouds:
         ctx.logger.warn('Account will not be populated with clouds')
-        return
-
-    dest = ctx.node.properties['stream']['destination_url']
-    token = ctx.instance.runtime_properties['_meta']['token']
-
-    for provider, data in cloud_creds.iteritems():
-        utils.add_cloud(dest=dest, token=token, cloud=(provider, data))
+    else:
+        for provider, data in clouds.iteritems():
+            utils.add_cloud(provider, data)
 
 
 init()

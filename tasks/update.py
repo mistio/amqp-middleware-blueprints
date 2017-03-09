@@ -21,6 +21,4 @@ except ImportError:
 
 if inputs.cloud_creds:
     for provider, data in inputs.cloud_creds.iteritems():
-        add_cloud(dest=ctx.node.properties['stream']['destination_url'],
-                  token=ctx.instance.runtime_properties['_meta']['token'],
-                  cloud=(provider, data))
+        add_cloud(provider, data)

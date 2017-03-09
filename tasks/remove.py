@@ -21,8 +21,4 @@ except ImportError:
 
 if inputs.clouds:
     for cloud in inputs.clouds:
-        utils.delete_cloud(
-            dest=ctx.node.properties['stream']['destination_url'],
-            token=ctx.instance.runtime_properties['_meta']['token'],
-            name=cloud
-        )
+        utils.delete_cloud(cloud)

@@ -3,14 +3,12 @@ from cloudify.state import ctx_parameters as inputs
 
 import os
 import sys
-import shutil
 
 
 ctx.download_resource(
     os.path.join('tasks', 'utils.py'),
     os.path.join(os.path.dirname(__file__), 'utils.py')
 )
-
 try:
     from utils import run_command
     from utils import SystemController
@@ -21,11 +19,11 @@ except ImportError:
 
 
 systemctl = SystemController('amqp-middleware')
-
 systemctl.execute('disable')
 systemctl.execute('delete')
 systemctl.execute('reload')
 
 if inputs['remove_source']:
     ctx.logger.info('Removing AMQP Middleware directory')
-    shutil.rmtree('/opt/amqp-middleware')
+    cmd = ['rm', '-rf', '/opt/amqp-middleware']
+    run_command(cmd, su=True)

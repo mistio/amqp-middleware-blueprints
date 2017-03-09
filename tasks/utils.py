@@ -1,10 +1,12 @@
 from cloudify import ctx
+from cloudify.exceptions import NonRecoverableError
 from cloudify.exceptions import \
     CommandExecutionException as _CommandExecutionException
 
 import os
 import json
 import tempfile
+import urlparse
 import requests
 import subprocess
 
@@ -79,15 +81,17 @@ class SystemController(object):
     def configure(self):
         """Configure the specified service."""
         ctx.logger.info('Configuring service %s', self.service)
-        service_config = os.path.join('service', '%s.service' % self.service)
-        return ['cp', service_config, SYSTEM_DIR]
+        svc = os.path.join('service', '%s.service' % self.service)
+        tmp = os.path.join(os.path.dirname(__file__), svc.split('/')[-1])
+        ctx.download_resource(svc, tmp)
+        return ['mv', tmp, SYSTEM_DIR]
 
     @property
     def delete(self):
         """Delete the specified service's configuration."""
         ctx.logger.info('Removing configuration for service %s', self.service)
-        service_config = os.path.join(SYSTEM_DIR, '%s.service' % self.service)
-        return ['rm', service_config]
+        svc = os.path.join(SYSTEM_DIR, '%s.service' % self.service)
+        return ['rm', svc]
 
     @property
     def reload(self):
@@ -120,13 +124,16 @@ def dump_to_file(payload, path):
 
 
 def render_to_file(src, dst):
-    """Render a file in place and then move it to the desired destination.
+    """Render a file and move it to the desired destination.
 
     :param src: the current path of the file to be rendered.
     :param dst: the desired path to move the file to.
     """
-    ctx.download_resource_and_render(src, '%s-rendered' % src)
-    cmd = ['mv', '%s-rendered' % src, dst]
+    tmp = os.path.join(
+        os.path.dirname(__file__), src.split('/')[-1]
+    )
+    ctx.download_resource_and_render(src, tmp)
+    cmd = ['mv', tmp, dst]
     run_command(cmd, su=True)
 
 
@@ -153,48 +160,67 @@ def install_pkg(pkgs):
             ctx.logger.info('Package \'%s\' already installed', pkg)
 
 
-def add_cloud(dest, token, cloud):
-    """Transfers cloud credentials to the specified destination endpoint."""
-    config = ctx.node.properties['stream']
-    scheme = 'https' if config['secure'] else 'http'
-    url = '%s://%s/api/v1/clouds' % (scheme, config['destination_url'])
+def add_cloud(provider, data):
+    """Transfers cloud credentials to the specified destination endpoint.
 
-    data = {'provider': cloud[0]}
-    data.update(cloud[1])
+    :param provider: Denotes the cloud provider, e.g. "ec2", "openstack", etc.
+    :param data: Cloud credentials as specified in the blueprint's inputs YAML.
+    """
+    ctx.logger.info('Adding "%s" cloud', data['title'])
 
-    ctx.logger.info('Adding \'%s\' cloud', data['title'])
-    req = requests.post(url, data=json.dumps(data),
-                        headers={'Authorization': token})
+    if ctx.node.properties['stream']['secure']:
+        scheme = 'https'
+    else:
+        scheme = 'http'
+    host = ctx.node.properties['stream']['destination_url']
+    if not host:
+        NonRecoverableError('No destination_url specified')
+
+    data.update({'provider': provider.lower()})
+    headers = {
+        'Authorization': ctx.instance.runtime_properties['_meta']['token']
+    }
+    req = requests.post('%s://%s/api/v1/clouds' % (scheme, host),
+                        data=json.dumps(data), headers=headers)
     if not req.ok:
-        ctx.logger.error('%d: Cloud \'%s\' not added successfully: %s',
+        ctx.logger.error('%d: Cloud "%s" not added successfully: %s',
                          req.status_code, data['title'], req.content)
     else:
-        resp = req.json()
+        response = req.json()
         clouds = ctx.instance.runtime_properties.pop('clouds', {})
         clouds.update({
-            data['title']: resp['id']
+            data['title']: response['id']
         })
         ctx.instance.runtime_properties['clouds'] = clouds
 
 
-def delete_cloud(dest, token, name):
-    """Revokes cloud credentials."""
+def delete_cloud(name):
+    """Revokes cloud credentials.
+
+    :param name: The name of the cloud for which to revoke credentials.
+    """
+    ctx.logger.info('Removing cloud "%s"', name)
+
     clouds = ctx.instance.runtime_properties.get('clouds', {})
     cloud_id = clouds.get(name)
     if not cloud_id:
-        ctx.logger.error('No cloud titled \'%s\' exists '
-                         'in local storage', name)
+        ctx.logger.error('No cloud titled "%s" exists in local storage', name)
         return
+    if ctx.node.properties['stream']['secure']:
+        scheme = 'https'
+    else:
+        scheme = 'http'
+    host = ctx.node.properties['stream']['destination_url']
+    if not host:
+        NonRecoverableError('No destination_url specified')
 
-    config = ctx.node.properties['stream']
-    scheme = 'https' if config['secure'] else 'http'
-    url = '%s://%s/api/v1/clouds/%s' % (scheme, config['destination_url'],
-                                        cloud_id)
-
-    ctx.logger.info('Removing cloud \'%s\'', name)
-    req = requests.delete(url, headers={'Authorization': token})
+    headers = {
+        'Authorization': ctx.instance.runtime_properties['_meta']['token']
+    }
+    req = requests.delete('%s://%s/api/v1/clouds/%s' % (
+                          scheme, host, cloud_id), headers=headers)
     if not req.ok:
-        ctx.logger.error('%d: Failed to remove cloud \'%s\' (%s): %s',
+        ctx.logger.error('%d: Failed to remove cloud "%s" (%s): %s',
                          req.status_code, name, cloud_id, req.content)
     else:
         ctx.instance.runtime_properties['clouds'].pop(name)
