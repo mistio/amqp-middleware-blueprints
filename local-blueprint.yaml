@@ -38,10 +38,11 @@ inputs:
   manager_cert_verify:
     description: Specifies whether to verify Cloudify Manager's SSL certificate
     type: boolean
-    default: true
+    default: false
   rabbitmq_host:
     description: The IP address of Cloudify Manager's RabbitMQ server
     type: string
+    default: ''
   rabbitmq_port:
     description: The port Cloudify Manager's RabbitMQ server listens at
     type: integer
@@ -53,7 +54,7 @@ inputs:
   rabbitmq_password:
     description: Password used to connect to RabbitMQ
     type: string
-    default: 'cloudify'
+    default: 'c10udify'
   rabbitmq_ssl_enabled:
     description: Specifies whether RabbitMQ has SSL enabled
     type: boolean
@@ -70,9 +71,19 @@ inputs:
   user_name:
     description: User's full name for registration
     type: string
+    default: ''
   user_email:
     description: User's e-mail
     type: string
+    default: ''
+  user_exists:
+    description: Specifies whether to use an existing user account
+    type: boolean
+    default: false
+  user_token:
+    description: User's token, associated with an existing account
+    type: string
+    default: ''
 
   # # # # # # # # # # # # #
   # Stream Inputs
@@ -81,14 +92,15 @@ inputs:
   destination_url:
     description: The destination URL to stream data to
     type: string
+    default: 'mist.io'
   secure:
     description: Specifies whether SSL should be used for the data streaming
     type: boolean
-    default: false
+    default: true
   ca_certs:
     description: Path to the bundle of CA certificates in case SSL is enabled
     type: string
-    default: '/etc/pki/tls/certs/ca-bundle.crt'
+    default: '/etc/ssl/certs/ca-bundle.crt'
 
   # # # # # # # # # # # # #
   # Cloud Credentials
@@ -144,6 +156,10 @@ workflows:
 
 
 outputs:
+  credentials:
+    description: Your authentication token
+    value:
+      token: { get_attribute: [ consumer, _meta, token ] }
   insights:
     description: The URL used to access your account
     value:

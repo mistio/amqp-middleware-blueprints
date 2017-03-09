@@ -49,6 +49,12 @@ data_types:
       email:
         type: string
         default: { get_input: user_email }
+      exists:
+        type: boolean
+        default: { get_input: user_exists }
+      token:
+        type: string
+        default: { get_input: user_token }
 
   cloudify.datatypes.manager.StreamConfiguration:
     properties:

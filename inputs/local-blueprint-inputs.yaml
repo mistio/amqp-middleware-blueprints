@@ -6,7 +6,7 @@
 # Cloudify Manager Inputs
 # # # # # # # # # # # # #
 
-# The IP of Cloudify Manager's HTTP API.
+# The IP address of the Cloudify Manager.
 manager_host: ''
 
 # Denotes whether Cloudify Manager has security enabled. In that case, one must
@@ -16,26 +16,26 @@ manager_host: ''
 #manager_username: 'cloudify'
 #manager_password: 'cloudify'
 
-# Denotes whether SSL is enabled. If `true`, the path to the bundle of CA
-# certificates must also be specified.
+# Denotes whether SSL is enabled and the Cloudify Manager's certificate should
+# be verified.
 #manager_ssl_enabled: false
-#manager_ca_certs: '/etc/ssl/certs/ca-bundle.crt'
-#manager_cert_verify: true
+#manager_cert_verify: false
 
 # The endpoint of Cloudify Manager's RabbitMQ server. This set of parameters is
-# mandatory in order for the AMQP Middleware to be able to connect to RabbitMQ.
-# If security is enabled, RabbitMQ listens by default at port 5671.
-rabbitmq_host: ''
+# required by the AMQP Middleware in order to be able to connect to RabbitMQ.
+# The `rabbitmq_host` defaults to `manager_host`, unless provided. If security
+# is enabled, RabbitMQ listens by default at port 5671.
+#rabbitmq_host: ''
 #rabbitmq_port: 5672
 
 # Specifies the username and password to be used in order to connect to
 # Cloudify Manager's RabbitMQ server.
 #rabbitmq_username: 'cloudify'
-#rabbitmq_password: 'cloudify'
+#rabbitmq_password: 'c10udify'
 
-# If RabbitMQ server has SSL enabled, set `rabbitmq_ssl_enabled` to `true`. In
-# general, the following option is enabled in case of a secure Cloudify Manager
-# installation.
+# If RabbitMQ server has SSL enabled, set `rabbitmq_ssl_enabled` to `true`. The
+# following option is enabled for secure Cloudify Manager installations. In any
+# case, users SHOULD NOT have to modify the `rabbitmq_cert_public` path.
 #rabbitmq_ssl_enabled: false
 #rabbitmq_cert_public: '/etc/rabbitmq/rabbit-pub.pem'
 
@@ -43,20 +43,19 @@ rabbitmq_host: ''
 # User Inputs
 # # # # # # # # # # # # #
 
-# User information for registration.
+# By default, users are required to provide a name and an e-mail address in
+# order to create a new account.
 user_name: ''
 user_email: ''
 
-# # # # # # # # # # # # #
-# Stream Inputs
-# # # # # # # # # # # # #
-
-# The destination URL to publish data to.
-destination_url: ''
-
-# Specifies whether the streaming of data should be over SSL.
-#secure: false
-#ca_certs: '/etc/pki/tls/certs/ca-bundle.crt'
+# Alternatively, in case one wants to:
+# 1. use an existing account or
+# 2. install additional AMQP Middleware(s) under the same account,
+# then `user_exists` must be set to `true`. In that case, an authentication
+# token has to be provided. Tokens can be retrieved by executing `cfy local
+# outputs` at an existing installation of the AMQP Middleware.
+#user_exists: false
+#user_token: ''
 
 # # # # # # # # # # # # #
 # Cloud Credentials
@@ -64,7 +63,14 @@ destination_url: ''
 
 # This section allows users to automatically populate a new account with clouds
 # upon registration. For that to happen, uncomment the desired cloud section
-# and fill in the necessary cloud credentials.
+# and fill in the required cloud credentials. Note that regions, if applicable,
+# must be specified by their region code and letter identifiers, as advertised
+# by each cloud provider.
+#
+# For instance, in case of AWS:
+#
+# - US East (N. Virginia) -->  "us-east-1"
+# - Asia Pacific (Tokyo)  -->  "ap-northeast-1"
 
 credentials:
 #  ec2:
