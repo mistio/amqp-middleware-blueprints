@@ -7,6 +7,9 @@ data_types:
       manager_secure:
         type: boolean
         default: { get_input: manager_secure }
+      manager_tenant:
+        type: string
+        default: { get_input: manager_tenant }
       manager_username:
         type: string
         default: { get_input: manager_username }

@@ -18,15 +18,19 @@ inputs:
   manager_secure:
     description: Denotes whether Cloudify Manager has security enabled
     type: boolean
-    default: false
+    default: true
+  manager_tenant:
+    description: Cloudify Manager's tenant to be used for installation
+    type: string
+    default: 'default_tenant'
   manager_username:
     description: Cloudify Manager's username in case security is enabled
     type: string
-    default: 'cloudify'
+    default: 'admin'
   manager_password:
     description: Cloudify Manager's password in case security is enabled
     type: string
-    default: 'cloudify'
+    default: 'admin'
   manager_ssl_enabled:
     description: Specifies whether Cloudify Manager has SSL enabled
     type: boolean
@@ -46,7 +50,7 @@ inputs:
   rabbitmq_port:
     description: The port Cloudify Manager's RabbitMQ server listens at
     type: integer
-    default: 5672
+    default: 5671
   rabbitmq_username:
     description: Username used to connect to RabbitMQ
     type: string
@@ -58,11 +62,11 @@ inputs:
   rabbitmq_ssl_enabled:
     description: Specifies whether RabbitMQ has SSL enabled
     type: boolean
-    default: false
+    default: true
   rabbitmq_cert_public:
     description: The public certificate to be used for SSL
     type: string
-    default: '/etc/rabbitmq/rabbit-pub.pem'
+    default: '/etc/cloudify/ssl/cloudify_internal_cert.pem'
 
   # # # # # # # # # # # # #
   # User Inputs
@@ -119,7 +123,7 @@ node_templates:
         create:
           implementation: tasks/install.py
           inputs:
-            agent_source: git+https://gitlab.ops.mist.io/mistio/amqp-middleware.git@v1.0.0#egg=amqp-middleware
+            agent_source: git+https://gitlab.ops.mist.io/mistio/amqp-middleware.git@v1.1.0#egg=amqp-middleware
           executor: central_deployment_agent
         start:
           implementation: tasks/start.py
