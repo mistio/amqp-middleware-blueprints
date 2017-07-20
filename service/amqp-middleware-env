@@ -1,4 +1,5 @@
 HOST="{{ ctx.instance.runtime_properties.config.manager.host }}"
+TENANT="{{ ctx.instance.runtime_properties.config.manager.tenant }}"
 USERNAME="{{ ctx.instance.runtime_properties.config.manager.username }}"
 PASSWORD="{{ ctx.instance.runtime_properties.config.manager.password }}"
 

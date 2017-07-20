@@ -81,6 +81,9 @@ def deploy_agent():
     # for easier rendering.
     ctx.instance.runtime_properties['config'] = node_properties
 
+    # Configure tenant.
+    configure_tenant(node_properties['manager'])
+
     ctx.logger.info('Rendering EnvironmentFile')
     utils.render_to_file(
         os.path.join('service', 'amqp-middleware-env'),
@@ -150,6 +153,28 @@ def populate(clouds):
     else:
         for provider, data in clouds.iteritems():
             utils.add_cloud(provider, data)
+
+
+def configure_tenant(manager):
+    """Configure the current tenant. For now, just provide the Insights
+    authentication token via the Cloudify Manager's Secret Storage."""
+    # Construct base URL.
+    scheme = 'https' if manager['ssl_enabled'] else 'http'
+    base_url = '%s://%s/api/v3' % (scheme, manager['host'])
+
+    # Setup session.
+    session = requests.Session()
+    session.auth = (manager['username'], manager['password'])
+    session.verify = manager['ca_certs'] if manager['verify'] else False
+    session.headers.update({'Tenant': manager['tenant'],
+                            'Content-Type': 'application/json'})
+
+    ctx.logger.info('Will store authentication token as insights_token secret')
+    token = ctx.instance.runtime_properties['_meta']['token']
+    url = '%s/secrets/insights_token' % base_url
+    req = session.put(url, data=json.dumps({'value': token}))
+    if not req.ok:
+        raise HttpException(url=url, code=req.status_code, message=req.content)
 
 
 init()

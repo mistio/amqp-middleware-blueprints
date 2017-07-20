@@ -2,46 +2,35 @@
 # setup the AMQP Middleware. Most of the parameters below come with default
 # values. Settings that are not commented out MUST be provided by the user.
 
-# # # # # # # # # # # # #
-# Cloudify Manager Inputs
-# # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                           Cloudify Manager Inputs                           #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # The IP address of the Cloudify Manager.
 manager_host: ''
 
-# Denotes whether Cloudify Manager has security enabled. In that case, one must
-# set `manager_secure` to `true` and provide the username and password required
-# for authentication.
-#manager_secure: false
-#manager_username: 'cloudify'
-#manager_password: 'cloudify'
+# The username and password of a Cloudify Manager user. This set of credentials
+# is required during installation, as well as for resource identification needs
+# later on. It is advised that a user with adequate rights is used (admin) in
+# order to avoid configuration errors.
+#manager_username: 'admin'
+#manager_password: 'admin'
 
-# Denotes whether SSL is enabled and the Cloudify Manager's certificate should
-# be verified.
-#manager_ssl_enabled: false
-#manager_cert_verify: false
+# The tenant the aforementioned user belongs to.
+#manager_tenant: 'default_tenant'
 
-# The endpoint of Cloudify Manager's RabbitMQ server. This set of parameters is
-# required by the AMQP Middleware in order to be able to connect to RabbitMQ.
-# The `rabbitmq_host` defaults to `manager_host`, unless provided. If security
-# is enabled, RabbitMQ listens by default at port 5671.
+# The endpoint of Cloudify Manager's RabbitMQ server. If left blank, defaults
+# to `manager_host`.
 #rabbitmq_host: ''
-#rabbitmq_port: 5672
 
 # Specifies the username and password to be used in order to connect to
 # Cloudify Manager's RabbitMQ server.
 #rabbitmq_username: 'cloudify'
 #rabbitmq_password: 'c10udify'
 
-# If RabbitMQ server has SSL enabled, set `rabbitmq_ssl_enabled` to `true`. The
-# following option is enabled for secure Cloudify Manager installations. In any
-# case, users SHOULD NOT have to modify the `rabbitmq_cert_public` path.
-#rabbitmq_ssl_enabled: false
-#rabbitmq_cert_public: '/etc/rabbitmq/rabbit-pub.pem'
-
-# # # # # # # # # # # # #
-# User Inputs
-# # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                   User Inputs                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # By default, users are required to provide a name and an e-mail address in
 # order to create a new account.
@@ -57,9 +46,9 @@ user_email: ''
 #user_exists: false
 #user_token: ''
 
-# # # # # # # # # # # # #
-# Cloud Credentials
-# # # # # # # # # # # # #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                              Cloud Credentials                              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # This section allows users to automatically populate a new account with clouds
 # upon registration. For that to happen, uncomment the desired cloud section
@@ -119,3 +108,23 @@ credentials:
 #    key_file: ''  # optional, TLS authentication
 #    cert_file: ''  # optional, TLS authentication
 #    ca_cert_file: ''  # optional, TLS authentication
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                               Security Section                              #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# Users SHOULD NOT have to edit this section, unless custom connfiguration is
+# in place regarding Cloudify Manager's external HTTP and internal APIs.
+
+# Denotes whether SSL is enabled and the Cloudify Manager's certificate should
+# be verified.
+#manager_ssl_enabled: false
+#manager_cert_verify: false
+
+# If SSL is enabled, this should point to the bundle of CA certificates.
+#manager_ca_certs: '/etc/ssl/certs/ca-bundle.crt'
+
+# Denotes whether SSL is enabled for RabbitMQ, which is true by default, and
+# points to the corresponding SSL certificate.
+#rabbitmq_ssl_enabled: true
+#rabbitmq_cert_public: '/etc/cloudify/ssl/cloudify_internal_cert.pem'
