@@ -160,7 +160,7 @@ def configure_tenant(manager):
     authentication token via the Cloudify Manager's Secret Storage."""
     # Construct base URL.
     scheme = 'https' if manager['ssl_enabled'] else 'http'
-    base_url = '%s://%s/api/v3.1' % (scheme, manager['host'])
+    base_url = '%s://%s/api/v3' % (scheme, manager['host'])
 
     # Setup session.
     session = requests.Session()
