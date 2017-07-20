@@ -119,7 +119,7 @@ node_templates:
         create:
           implementation: tasks/install.py
           inputs:
-            agent_source: git+https://gitlab.ops.mist.io/mistio/amqp-middleware.git@master#egg=amqp-middleware
+            agent_source: git+https://gitlab.ops.mist.io/mistio/amqp-middleware.git@v1.0.0#egg=amqp-middleware
           executor: central_deployment_agent
         start:
           implementation: tasks/start.py
