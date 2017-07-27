@@ -5,7 +5,7 @@ RabbitMQ middleware used to stream monitoring data.
 
 ## Installation
 
-Mist.io's [AMQP Middleware](https://gitlab.ops.mist.io/mistio/amqp-middleware)
+Mist.io's [AMQP Middleware](https://github.com/mistio/amqp-middleware)
 can be installed by using the corresponding Cloudify blueprint.
 
 ### Requirements
@@ -14,9 +14,9 @@ All that is required is the Cloudify CLI:
 
     pip install cloudify
 
-and the corresponding Cloudify blueprint. See the [tags](https://gitlab.ops.mist.io/mistio/amqp-middleware-blueprints/tags)
+and the corresponding Cloudify blueprint. See the [releases](https://github.com/mistio/amqp-middleware-blueprints/releases)
 section in order to download the version of the blueprints corresponding to the
-most suited [version](https://gitlab.ops.mist.io/mistio/amqp-middleware/tags)
+most suited [version](https://github.com/mistio/amqp-middleware/releases)
 of the middleware.
 
 It is **important** to use a version of the Cloudify CLI that supports local
