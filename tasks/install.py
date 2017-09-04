@@ -140,6 +140,7 @@ def register(user):
         '_meta': {
             'token': response['token'],
             'manager_id': response['uuid'],
+            'read_only_token': response['read_only_token'],
         }
     })
 
@@ -170,7 +171,7 @@ def configure_tenant(manager):
                             'Content-Type': 'application/json'})
 
     ctx.logger.info('Will store authentication token as insights_token secret')
-    token = ctx.instance.runtime_properties['_meta']['token']
+    token = ctx.instance.runtime_properties['_meta']['read_only_token']
     url = '%s/secrets/insights_token' % base_url
     req = session.put(url, data=json.dumps({'value': token}))
     if not req.ok:
