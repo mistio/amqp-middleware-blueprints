@@ -29,7 +29,7 @@ manager_host: ''
 #rabbitmq_password: 'c10udify'
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#                                   User Inputs                               #
+#                                 User Inputs                                 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 # By default, users are required to provide a name and an e-mail address in
@@ -128,3 +128,22 @@ credentials:
 # points to the corresponding SSL certificate.
 #rabbitmq_ssl_enabled: true
 #rabbitmq_cert_public: '/etc/cloudify/ssl/cloudify_internal_cert.pem'
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                              Mist.io Settings                               #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# The following settings SHOULD NOT be modified unless users have their own,
+# on-prem installation of Mist.io. By default, monitoring data is sent to
+# the Mist.io SaaS at https://mist.io, however users may choose to use their
+# own local installation.
+
+# The destination URL to sent data to. Defaults to the Mist.io SaaS. Another
+# Mist.io installation may be specified by either its hostname or IP address.
+#destination_url: 'mist.io'
+
+# Specifies whether the streaming of data should be over SSL. In case of a
+# new, vanilla, on-prem installation of Mist.io, this setting should probably
+# be disabled at first.
+#secure: true
+#ca_certs: '/etc/ssl/certs/ca-bundle.crt'
