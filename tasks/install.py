@@ -55,8 +55,7 @@ def deploy_agent():
     utils.run_command(cmd, su=True)
 
     ctx.logger.info('Installing AMQP Middleware and required dependencies')
-    repo = inputs['agent_source']
-    cmd = ['%s/bin/pip' % AGENT_VENV, 'install', '-e', repo]
+    cmd = ['%s/bin/pip' % AGENT_VENV, 'install', inputs['agent_source']]
     utils.run_command(cmd, su=True)
 
     # Get node properties.
