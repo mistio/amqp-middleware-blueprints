@@ -60,6 +60,16 @@ user_email: ''
 #
 # - US East (N. Virginia) -->  "us-east-1"
 # - Asia Pacific (Tokyo)  -->  "ap-northeast-1"
+#
+# A common, special `sync_tags` (boolean) flag may also be specified per cloud
+# allowing the syncing of tags already existing on each cloud provider. Please
+# enable this functionality with caution, since tags can change the state of
+# RBAC, thus risking security holes. The `sync_tags` flag is optional and is
+# disabled by default for all clouds.
+#
+# If one wants to enable the aforementioned functionality for a specific cloud,
+# simply set `sync_tags: true` to the corresponding set of cloud credentials as
+# shown in the first case of EC2.
 
 credentials:
 #  ec2:
@@ -67,6 +77,7 @@ credentials:
 #    apikey: ''
 #    apisecret: ''
 #    region: ''
+#    sync_tags: false  # per-cloud setting to enable sync of upstream tags
 
 #  digitalocean:
 #    title: 'DigitalOcean'
